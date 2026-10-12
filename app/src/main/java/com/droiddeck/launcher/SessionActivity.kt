@@ -1797,7 +1797,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         val rect = drawnRect() ?: return
         val cx = x.coerceIn(rect.left, rect.right)
         val cy = y.coerceIn(rect.top, rect.bottom)
-        WaylandCompositor.nativeSendPointer(1, InputSpace.x(cx, surfaceView.width), InputSpace.y(cy, surfaceView.height))
+        WaylandCompositor.nativeSendPointer(1, InputSpace.x(cx, rect), InputSpace.y(cy, rect))
         showCursor(cx, cy)
     }
 
@@ -1997,7 +1997,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         val rect = drawnRect() ?: return
         val px = rect.left + nx * rect.width()
         val py = rect.top + ny * rect.height()
-        WaylandCompositor.nativeSendPointer(1, InputSpace.x(px, surfaceView.width), InputSpace.y(py, surfaceView.height))
+        WaylandCompositor.nativeSendPointer(1, InputSpace.x(px, rect), InputSpace.y(py, rect))
         showCursor(px, py)
     }
 
@@ -2072,7 +2072,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
             val x = event.getX(index).coerceIn(rect.left, rect.right)
             val y = event.getY(index).coerceIn(rect.top, rect.bottom)
             WaylandCompositor.nativeSendTouch(action, event.getPointerId(index),
-                InputSpace.x(x, surfaceView.width), InputSpace.y(y, surfaceView.height))
+                InputSpace.x(x, rect), InputSpace.y(y, rect))
         }
         when (event.actionMasked) {
             // A first finger starts a new gesture, and Android has ended every earlier one: whatever

@@ -2938,19 +2938,15 @@ static void pointer_button(uint32_t button, int pressed) {
     pointer_input(0, 0, 1, button, pressed);
 }
 
-/* Java touch events arrive in INPUT_SPACE over the whole output: action 0=press, 1=move, 2=release.
- * Output pixels go through the inverse of the scale mode's mapping (letterbox bars, FILL crop, a
- * TOP/BOTTOM half), so the touch lands on the scene pixel that is drawn under the finger. */
+/* Java touch events arrive in INPUT_SPACE over the drawn picture: action 0=press, 1=move, 2=release.
+ * Directly mapped to scene coordinates so taps and the pointer land on the exact
+ * scene pixel under the finger or on-screen cursor across all aspect ratios and presentation paths. */
 static void deliver_pointer(const struct input_msg *m) {
-    int w, h, ow, oh;
+    int w, h;
     double x, y;
     scene_size(&w, &h);
-    vkp_output_size(&ow, &oh);
-    if (ow <= 0 || oh <= 0 ||
-        !vkp_output_to_scene((double)m->p2 * ow / INPUT_SPACE_W, (double)m->p3 * oh / INPUT_SPACE_H, &x, &y)) {
-        x = (double)m->p2 * w / INPUT_SPACE_W; /* nothing drawn yet: plain stretch */
-        y = (double)m->p3 * h / INPUT_SPACE_H;
-    }
+    x = (double)m->p2 * w / INPUT_SPACE_W;
+    y = (double)m->p3 * h / INPUT_SPACE_H;
     if (x < 0) x = 0;
     if (y < 0) y = 0;
     if (x > w - 1) x = w - 1;
@@ -2959,14 +2955,10 @@ static void deliver_pointer(const struct input_msg *m) {
 }
 
 static void input_output_to_scene(int px, int py, double *x, double *y) {
-    int w, h, ow, oh;
+    int w, h;
     scene_size(&w, &h);
-    vkp_output_size(&ow, &oh);
-    if (ow <= 0 || oh <= 0 ||
-        !vkp_output_to_scene((double)px * ow / INPUT_SPACE_W, (double)py * oh / INPUT_SPACE_H, x, y)) {
-        *x = (double)px * w / INPUT_SPACE_W;
-        *y = (double)py * h / INPUT_SPACE_H;
-    }
+    *x = (double)px * w / INPUT_SPACE_W;
+    *y = (double)py * h / INPUT_SPACE_H;
     if (*x < 0) *x = 0;
     if (*y < 0) *y = 0;
     if (*x > w - 1) *x = w - 1;
